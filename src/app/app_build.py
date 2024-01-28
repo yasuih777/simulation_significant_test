@@ -39,7 +39,7 @@ class AppBuilder:
     def __call__(self) -> None:
         st.set_page_config(
             page_title="統計的仮説検定シミュレーター",
-            layout="centered",
+            layout="wide",
             initial_sidebar_state="collapsed",
         )
         self.sidebar_component()
