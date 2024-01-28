@@ -16,7 +16,7 @@ class AppBuilder:
 
         self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
-        self.test_name: list[str] = ["ttest"]
+        self.test_name: list[str] = ["t_test", "wilcoxon_test"]
 
         self.generators: dict[str, generate.DistGenerator] = {
             "X": generate.build_generator(self.dist_name[0], **self.dist_param["X"]),
@@ -188,8 +188,10 @@ class AppBuilder:
         method: Optional[str]
         test_name = st.selectbox("検定", self.test_name)
 
-        if test_name == "ttest":
+        if test_name == "t_test":
             method = st.selectbox("T検定のメソッド", ["welch", "student", "paired"])
+        elif test_name == "wilcoxon_test":
+            method = st.selectbox("Wilcoxon(or MannwhitneyのU)検定のメソッド", [None, "paired", "sign"])
         else:
             method = None
 
@@ -215,6 +217,13 @@ class AppBuilder:
                 test_name = "対応のあるのT検定"
             elif simulator.test_info["method"] == "one-sample":
                 test_name = "1標本T検定"
+        elif isinstance(simulator, simulate.WilcoxonTestSimulator):
+            if simulator.test_info["method"] is None:
+                test_name = "MannwhitneyのU検定"
+            elif simulator.test_info["method"] == "paired":
+                test_name = "Wilcoxonの符号付き順位検定"
+            elif simulator.test_info["method"] == "sign":
+                test_name = "符号検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
         st.text(

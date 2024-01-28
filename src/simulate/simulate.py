@@ -78,9 +78,7 @@ class StatTestSimulator:
         return lower + upper
 
     def basic_patch(self, idx: int) -> None:
-        self.test_param.update(a=self.generators["X"].create_sample())
-        if self.test_info["method"] != "one-sample":
-            self.test_param.update(b=self.generators["Y"].create_sample())
+        self.sample_update()
 
         test_result = self.test_funcs["test"](**self.test_param)
 
@@ -96,6 +94,9 @@ class StatTestSimulator:
             pass
 
         deque(map(batch_func, range(self.iters)))
+    
+    def sample_update(self) -> None:
+        raise NotImplementedError("Must override!!")
 
     def plot_range(self) -> tuple[float, float]:
         raise NotImplementedError("Must override!!")
@@ -182,6 +183,11 @@ class TTestSimulator(StatTestSimulator):
 
         self.h0_param.update(df=df, nc=0)
         self.h1_param.update(df=df, nc=nc)
+    
+    def sample_update(self) -> None:
+        self.test_param.update(a=self.generators["X"].create_sample())
+        if self.test_info["method"] != "one-sample":
+            self.test_param.update(b=self.generators["Y"].create_sample())
 
     def plot_range(self) -> tuple[float, float]:
         param = self.h0_param.copy()
@@ -190,7 +196,73 @@ class TTestSimulator(StatTestSimulator):
         return stats.nct.interval(**param)
 
 
+class WilcoxonTestSimulator(StatTestSimulator):
+    def __init__(
+        self,
+        test_info: TestInfo,
+        generators: dict[str, DistGenerator],
+        iters: int = 10000,
+        test_type: TEST_TYPE = "basic",
+        seed: int | None = None,
+    ) -> None:
+        super().__init__(test_info, generators, iters, test_type, seed)
+
+        self.test_funcs = {
+            "stat_prob": stats.norm.pdf,
+            "stat_dist": stats.norm.cdf,
+            "stat_dist_inv": stats.norm.sf,
+            "stat_quan": stats.norm.ppf,
+            "stat_quan_inv": stats.norm.isf,
+        }
+
+        if self.test_info["method"] is None:
+            self.test_funcs["test"] = stats.mannwhitneyu
+        elif self.test_info["method"] == "paired":
+            self.test_funcs["test"] = stats.wilcoxon
+        elif self.test_info["method"] == "sign":
+            self.test_funcs["test"] = stats.wilcoxon
+        else:
+            raise ValueError(
+                "t test method must be [None, paired, sign]"
+            )
+
+    def reset_h_parameter(self) -> None:
+        nc = np.mean(self.results["stat_values"])
+
+        nx = self.generators["X"].sample_size
+        ny = self.generators["Y"].sample_size
+        if self.test_info["method"] is None:
+            mu = nx * ny / 2
+            sigma = np.sqrt(nx * ny * (nx + ny + 1) / 12)
+        elif self.test_info["method"] == "paired":
+            mu = nx * (nx + 1) / 2
+            sigma = np.sqrt(nx * (nx + 1) * (2 * nx + 1) / 24)
+        elif self.test_info["method"] == "sign":
+            mu = nx / 2
+            sigma = np.sqrt(nx / 4)
+
+        self.h0_param.update(loc=mu, scale=sigma)
+        self.h1_param.update(loc=nc, scale=sigma)
+    
+    def sample_update(self) -> None:
+        if self.test_info["method"] != "sign":
+            self.test_param.update(x=self.generators["X"].create_sample())
+            self.test_param.update(y=self.generators["Y"].create_sample())
+        else:
+            self.test_param.update(
+                x=self.generators["X"].create_sample() - self.generators["Y"].create_sample()
+            )
+
+    def plot_range(self) -> tuple[float, float]:
+        param = self.h0_param.copy()
+        param.update(confidence=self.plot_prob)
+
+        return stats.norm.interval(**param)
+
+
 def build_simulator(name: str, **args) -> StatTestSimulator:
-    if name == "ttest":
+    if name == "t_test":
         return TTestSimulator(**args)
+    if name == "wilcoxon_test":
+        return WilcoxonTestSimulator(**args)
     return StatTestSimulator(**args)
