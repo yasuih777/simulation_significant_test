@@ -62,7 +62,29 @@ class NormGenerator(DistGenerator):
         return stats.norm.interval(**param)
 
 
+class LogNormGenerator(DistGenerator):
+    def __init__(self, sample_size: int = 50, mu: float = 0, sigma: float = 1) -> None:
+        super().__init__(sample_size)
+        self.plot_prob = 0.95
+
+        self.funcs = {
+            "rand": stats.lognorm.rvs,
+            "stat_prob": stats.lognorm.pdf,
+        }
+        self.func_param = {"scale": np.exp(mu), "s": sigma}
+
+        self.dist_name = f"LogNorm({mu}, {sigma})"
+
+    def plot_range(self) -> tuple[float, float]:
+        param = self.func_param.copy()
+        param.update(q=self.plot_prob)
+
+        return (0, stats.lognorm.ppf(**param))
+
+
 def build_generator(name: str, **args) -> DistGenerator:
     if name == "norm":
         return NormGenerator(**args)
+    elif name == "lognorm":
+        return LogNormGenerator(**args)
     return DistGenerator(**args)

@@ -14,7 +14,7 @@ class AppBuilder:
     def __init__(self) -> None:
         self.logger = logging.set_logger("warning")
 
-        self.dist_name: list[str] = ["norm"]
+        self.dist_name: list[str] = ["norm", "lognorm"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
         self.test_name: list[str] = ["ttest"]
 
@@ -159,6 +159,13 @@ class AppBuilder:
         if dist_name == "norm":
             self.dist_param[name].update(
                 {"mu": st.number_input(f"{name}: mu", value=0.0)}
+            )
+            self.dist_param[name].update(
+                {"sigma": st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)}
+            )
+        elif dist_name == "lognorm":
+            self.dist_param[name].update(
+                {"mu": st.number_input(f"{name}: mu", min_value=-0.0, value=1.0)}
             )
             self.dist_param[name].update(
                 {"sigma": st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)}
