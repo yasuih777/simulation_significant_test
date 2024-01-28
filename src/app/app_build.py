@@ -58,7 +58,7 @@ class AppBuilder:
         with st_col[0]:
             st.link_button("X(Twitter)", "https://twitter.com/yugetsubiostat")
         with st_col[1]:
-            st.link_button("Github", "")
+            st.link_button("Github", "https://github.com/yasuih777/simulation_significant_test")
 
         st.sidebar.subheader("使い方")
         st.sidebar.markdown(
