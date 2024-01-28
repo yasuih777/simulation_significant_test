@@ -14,7 +14,7 @@ class AppBuilder:
     def __init__(self) -> None:
         self.logger = logging.set_logger("warning")
 
-        self.dist_name: list[str] = ["norm", "lognorm"]
+        self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
         self.test_name: list[str] = ["ttest"]
 
@@ -169,6 +169,13 @@ class AppBuilder:
             )
             self.dist_param[name].update(
                 {"sigma": st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)}
+            )
+        elif dist_name == "uniform":
+            self.dist_param[name].update(
+                {"a": st.number_input(f"{name}: a", value=0.0)}
+            )
+            self.dist_param[name].update(
+                {"b": st.number_input(f"{name}: b", value=1.0)}
             )
 
         self.generators[name] = generate.build_generator(
