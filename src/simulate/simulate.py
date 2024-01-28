@@ -12,6 +12,7 @@ from src.utils.utils import set_seed
 
 TEST_TYPE = Literal["basic"]
 
+
 class StatTestSimulator:
     def __init__(
         self,
