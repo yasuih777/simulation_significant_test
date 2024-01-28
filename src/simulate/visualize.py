@@ -14,8 +14,8 @@ class Visualizer:
         self.simulator = simulator
 
     def generate_density(self, axes: plt.Axes) -> plt.Axes:
-        points_x = self.simulator.generators["X"].density_points()
-        points_y = self.simulator.generators["Y"].density_points()
+        points_x = self.simulator.generators["X"].density_points(1000)
+        points_y = self.simulator.generators["Y"].density_points(1000)
         label_x = self.simulator.generators["X"].dist_name
         label_y = self.simulator.generators["Y"].dist_name
 

@@ -14,7 +14,7 @@ class AppBuilder:
     def __init__(self) -> None:
         self.logger = logging.set_logger("warning")
 
-        self.dist_name: list[str] = ["norm"]
+        self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
         self.test_name: list[str] = ["ttest"]
 
@@ -163,6 +163,20 @@ class AppBuilder:
             self.dist_param[name].update(
                 {"sigma": st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)}
             )
+        elif dist_name == "lognorm":
+            self.dist_param[name].update(
+                {"mu": st.number_input(f"{name}: mu", min_value=-0.0, value=1.0)}
+            )
+            self.dist_param[name].update(
+                {"sigma": st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)}
+            )
+        elif dist_name == "uniform":
+            self.dist_param[name].update(
+                {"a": st.number_input(f"{name}: a", value=0.0)}
+            )
+            self.dist_param[name].update(
+                {"b": st.number_input(f"{name}: b", value=1.0)}
+            )
 
         self.generators[name] = generate.build_generator(
             dist_name, **self.dist_param[name]
@@ -181,7 +195,7 @@ class AppBuilder:
 
         return test_name, method
 
-    def __test_discription(self):
+    def __test_discription(self) -> None:
         simulator = self.simulator
         generators = self.simulator.generators
 
@@ -221,6 +235,6 @@ class AppBuilder:
         if simulator.test_type == "basic":
             pass
 
-    def __simulation(self):
+    def __simulation(self) -> None:
         self.simulator.execute()
         self.visualizer.reset_simulator(self.simulator)

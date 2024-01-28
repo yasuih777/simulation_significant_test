@@ -3,7 +3,6 @@
 from typing import Optional
 
 import numpy as np
-import streamlit as st
 from scipy import stats
 
 from src.utils.typing import GeneratorFunc
@@ -62,7 +61,49 @@ class NormGenerator(DistGenerator):
         return stats.norm.interval(**param)
 
 
+class LogNormGenerator(DistGenerator):
+    def __init__(self, sample_size: int = 50, mu: float = 0, sigma: float = 1) -> None:
+        super().__init__(sample_size)
+        self.plot_prob = 0.95
+
+        self.funcs = {
+            "rand": stats.lognorm.rvs,
+            "stat_prob": stats.lognorm.pdf,
+        }
+        self.func_param = {"scale": np.exp(mu), "s": sigma}
+
+        self.dist_name = f"LogNorm({mu}, {sigma})"
+
+    def plot_range(self) -> tuple[float, float]:
+        param = self.func_param.copy()
+        param.update(q=self.plot_prob)
+
+        return (0, stats.lognorm.ppf(**param))
+
+
+class UniGenerator(DistGenerator):
+    def __init__(self, sample_size: int = 50, a: float = 0, b: float = 1) -> None:
+        super().__init__(sample_size)
+
+        self.funcs = {
+            "rand": stats.uniform.rvs,
+            "stat_prob": stats.uniform.pdf,
+        }
+        self.func_param = {"loc": a, "scale": b - a}
+
+        self.dist_name = f"Uni({a}, {b})"
+
+    def plot_range(self) -> tuple[float, float]:
+        param = self.func_param.copy()
+
+        return (param["loc"], param["loc"] + param["scale"])
+
+
 def build_generator(name: str, **args) -> DistGenerator:
     if name == "norm":
         return NormGenerator(**args)
+    elif name == "lognorm":
+        return LogNormGenerator(**args)
+    elif name == "uniform":
+        return UniGenerator(**args)
     return DistGenerator(**args)
