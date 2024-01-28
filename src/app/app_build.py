@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 import platform
-from typing import Any, Optional
+from typing import Optional
 
 import pkg_resources
 import streamlit as st
@@ -39,7 +39,7 @@ class AppBuilder:
     def __call__(self) -> None:
         st.set_page_config(
             page_title="統計的仮説検定シミュレーター",
-            layout="centered",
+            layout="wide",
             initial_sidebar_state="collapsed",
         )
         self.sidebar_component()
@@ -58,7 +58,17 @@ class AppBuilder:
         with st_col[0]:
             st.link_button("X(Twitter)", "https://twitter.com/yugetsubiostat")
         with st_col[1]:
-            st.link_button("Github", "")
+            st.link_button(
+                "Github", "https://github.com/yasuih777/simulation_significant_test"
+            )
+
+        st.sidebar.subheader("使い方")
+        st.sidebar.markdown(
+            "1. 確率分布を設定します\n"
+            "2. 検定の方法を設定します\n"
+            "3. 「シミュレーション開始」をクリックします\n"
+            "4. P値が一様になっていることや検出力をチェックします"
+        )
 
         st.sidebar.subheader("Licence")
         st.sidebar.link_button("MIT Licence", "https://opensource.org/license/mit/")
