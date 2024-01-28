@@ -181,7 +181,7 @@ class AppBuilder:
 
         return test_name, method
 
-    def __test_discription(self):
+    def __test_discription(self) -> None:
         simulator = self.simulator
         generators = self.simulator.generators
 
@@ -221,6 +221,6 @@ class AppBuilder:
         if simulator.test_type == "basic":
             pass
 
-    def __simulation(self):
+    def __simulation(self) -> None:
         self.simulator.execute()
         self.visualizer.reset_simulator(self.simulator)

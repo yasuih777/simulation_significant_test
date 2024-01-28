@@ -45,7 +45,7 @@ class StatTestSimulator:
     def reset_h_parameter(self) -> None:
         raise NotImplementedError("Must override!!")
 
-    def reset_refection(self):
+    def reset_refection(self) -> None:
         param = self.h0_param.copy()
 
         if self.test_info["alternative"] == "two-sided":
