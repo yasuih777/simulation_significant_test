@@ -60,6 +60,14 @@ class AppBuilder:
         with st_col[1]:
             st.link_button("Github", "")
 
+        st.sidebar.subheader("使い方")
+        st.sidebar.markdown(
+            "1. 確率分布を設定します\n" \
+            "2. 検定の方法を設定します\n" \
+            "3. 「シミュレーション開始」をクリックします\n"\
+            "4. P値が一様になっていることや検出力をチェックします"
+        )
+
         st.sidebar.subheader("Licence")
         st.sidebar.link_button("MIT Licence", "https://opensource.org/license/mit/")
 
