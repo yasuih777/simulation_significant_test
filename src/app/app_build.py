@@ -133,21 +133,14 @@ class AppBuilder:
         if self.simulation_flag:
             self.__simulation()
 
-            results = st.columns(2)
-            with results[0]:
-                with st.container(border=True):
-                    st.text("有意差が認められた割合")
-                    st.write(f":red[{self.simulator.per_signicant() * 100:.2f}%]")
-            with results[1]:
-                with st.container(border=True):
-                    st.text("統計量の平均を効果量としたときの検出力")
-                    st.write(f":blue[{self.simulator.calc_power() * 100:.2f}%]")
+            with st.container(border=True):
+                st.text("有意差が認められた割合")
+                st.write(f":red[{self.simulator.per_signicant() * 100:.2f}%]")
 
             fig, axes = visualize.create_figure(
-                nrows=1, ncols=2, figsize=(8, 3), tight_layout=True
+                nrows=1, ncols=1, figsize=(8, 3), tight_layout=True
             )
-            self.visualizer.p_histogram(axes[0])
-            self.visualizer.stat_density(axes[1])
+            self.visualizer.p_histogram(axes)
             st.pyplot(fig)
 
     def __generate_input(self, name: str) -> None:

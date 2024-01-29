@@ -12,12 +12,3 @@ class TestInfo(TypedDict):
 class GeneratorFunc(TypedDict):
     rand: Callable
     stat_prob: Callable
-
-
-class TestFunc(TypedDict):
-    test: Callable
-    stat_prob: Callable
-    stat_dist: Callable
-    stat_dist_inv: Callable
-    stat_quan: Callable
-    stat_quan_inv: Callable
