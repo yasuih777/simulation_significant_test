@@ -33,9 +33,11 @@ class Visualizer:
         return axes
 
     def p_histogram(self, axes: plt.Axes) -> plt.Axes:
+        bins = 100
+        axes.axhline(y = self.simulator.iters / bins, linestyle="--", color="black", alpha=0.5)
         axes.hist(
             self.simulator.p_values,
-            bins=50,
+            bins=bins,
             range=(0, 1),
             color="grey",
             ec="black",
