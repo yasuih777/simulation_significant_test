@@ -99,13 +99,24 @@ class AppBuilder:
                 )
 
         st.header("2. サンプルが従う確率分布の設定")
-        gparam_body = st.columns(2)
-        with gparam_body[0]:
-            with st.container(border=True):
-                self.__generate_input("X")
-        with gparam_body[1]:
-            with st.container(border=True):
-                self.__generate_input("Y")            
+        if method != "one-sample":
+            gparam_body = st.columns(2)
+            with gparam_body[0]:
+                with st.container(border=True):
+                    self.__generate_input("X")
+            with gparam_body[1]:
+                with st.container(border=True):
+                    self.__generate_input("Y")
+        else:
+            gparam_body = st.columns(2)
+            with gparam_body[0]:
+                with st.container(border=True):
+                    self.simulation_param.update(
+                        mu=st.number_input("X群と比較する値", value=0.0)
+                    )
+            with gparam_body[1]:
+                with st.container(border=True):
+                    self.__generate_input("X")
 
         fig, ax = visualize.create_figure(figsize=(8, 3))
         self.visualizer.generate_density(ax)
