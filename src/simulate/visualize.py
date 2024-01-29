@@ -6,25 +6,25 @@ from src.simulate import simulate, generate
 
 
 class Visualizer:
-    def __init__(self, generators: dict[str, generate.DistGenerator]) -> None:
-        self.generators = generators
-        self.simulator: simulate.StatTestSimulator
+    def __init__(self, simulator: simulate.StatTestSimulator) -> None:
+        self.simulator = simulator
 
     def update_simulator(self, simulator: simulate.StatTestSimulator) -> None:
         self.simulator = simulator
 
     def generate_density(self, axes: plt.Axes) -> plt.Axes:
-        for key, generator in self.generators.items():
+        for key, generator in self.simulator.generators.items():
             points = generator.density_points(1000)
             label = generator.dist_name
 
             axes.fill_between(
                 points["x"], points["y"], alpha=0.5, label=f"{key}: {label}"
             )
+
         axes.set_title("Generator probability distribution")
         axes.set_xlabel("X")
         axes.set_ylabel("Density")
-        axes.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
+        axes.legend(bbox_to_anchor=(1.01, 1), loc="upper left", borderaxespad=0)
 
         return axes
 

@@ -106,12 +106,6 @@ class AppBuilder:
                 with st.container(border=True):
                     self.__generate_input("X")
 
-        fig, ax = visualize.create_figure(figsize=(8, 3))
-        self.visualizer = visualize.Visualizer(self.simulation_param["generators"])
-        self.visualizer.generate_density(ax)
-        st.pyplot(fig)
-        fig.clear()
-
         st.header("3. シミュレーターの設定")
         with st.container(border=True):
             sparam_body = st.columns(3)
@@ -147,7 +141,17 @@ class AppBuilder:
             test_name,
             **self.simulation_param
         )
-        self.__test_discription()
+        self.visualizer = visualize.Visualizer(self.simulator)
+
+        discription_body = st.columns(2)
+        with discription_body[0]:
+            self.__test_discription()
+        with discription_body[1]:
+            fig, ax = visualize.create_figure(figsize=(6, 4))
+            self.visualizer.generate_density(ax)
+            st.pyplot(fig)
+            fig.clear()
+
 
         self.simulation_flag = st.button("シミュレーション開始", type="primary")
         if self.simulation_flag:
