@@ -16,7 +16,7 @@ class AppBuilder:
 
         self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
-        self.test_name: list[str] = ["ttest"]
+        self.test_name: list[str] = ["t_test", "wilcoxon_test"]
 
         self.generators: dict[str, generate.DistGenerator] = {
             "X": generate.build_generator(self.dist_name[0], **self.dist_param["X"]),
@@ -133,21 +133,14 @@ class AppBuilder:
         if self.simulation_flag:
             self.__simulation()
 
-            results = st.columns(2)
-            with results[0]:
-                with st.container(border=True):
-                    st.text("有意差が認められた割合")
-                    st.write(f":red[{self.simulator.per_signicant() * 100:.2f}%]")
-            with results[1]:
-                with st.container(border=True):
-                    st.text("統計量の平均を効果量としたときの検出力")
-                    st.write(f":blue[{self.simulator.calc_power() * 100:.2f}%]")
+            with st.container(border=True):
+                st.text("有意差が認められた割合")
+                st.write(f":red[{self.simulator.per_signicant() * 100:.2f}%]")
 
             fig, axes = visualize.create_figure(
-                nrows=1, ncols=2, figsize=(8, 3), tight_layout=True
+                nrows=1, ncols=1, figsize=(8, 3), tight_layout=True
             )
-            self.visualizer.p_histogram(axes[0])
-            self.visualizer.stat_density(axes[1])
+            self.visualizer.p_histogram(axes)
             st.pyplot(fig)
 
     def __generate_input(self, name: str) -> None:
@@ -188,8 +181,12 @@ class AppBuilder:
         method: Optional[str]
         test_name = st.selectbox("検定", self.test_name)
 
-        if test_name == "ttest":
+        if test_name == "t_test":
             method = st.selectbox("T検定のメソッド", ["welch", "student", "paired"])
+        elif test_name == "wilcoxon_test":
+            method = st.selectbox(
+                "Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"]
+            )
         else:
             method = None
 
@@ -215,6 +212,11 @@ class AppBuilder:
                 test_name = "対応のあるのT検定"
             elif simulator.test_info["method"] == "one-sample":
                 test_name = "1標本T検定"
+        elif isinstance(simulator, simulate.WilcoxonTestSimulator):
+            if simulator.test_info["method"] == "normal":
+                test_name = "MannwhitneyのU検定"
+            elif simulator.test_info["method"] == "paired":
+                test_name = "Wilcoxonの符号付き順位検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
         st.text(
