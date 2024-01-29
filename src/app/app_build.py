@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 import platform
+import time
 from typing import Optional
 
 import pkg_resources
@@ -238,5 +239,7 @@ class AppBuilder:
             pass
 
     def __simulation(self) -> None:
-        self.simulator.execute()
+        with st.spinner("Simulator progress..."):
+            self.simulator.execute()
+
         self.visualizer.reset_simulator(self.simulator)
