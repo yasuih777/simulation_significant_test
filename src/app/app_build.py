@@ -191,7 +191,7 @@ class AppBuilder:
         if test_name == "t_test":
             method = st.selectbox("T検定のメソッド", ["welch", "student", "paired"])
         elif test_name == "wilcoxon_test":
-            method = st.selectbox("Wilcoxon(or MannwhitneyのU)検定のメソッド", [None, "paired", "sign"])
+            method = st.selectbox("Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"])
         else:
             method = None
 
@@ -218,12 +218,10 @@ class AppBuilder:
             elif simulator.test_info["method"] == "one-sample":
                 test_name = "1標本T検定"
         elif isinstance(simulator, simulate.WilcoxonTestSimulator):
-            if simulator.test_info["method"] is None:
+            if simulator.test_info["method"] == "normal":
                 test_name = "MannwhitneyのU検定"
             elif simulator.test_info["method"] == "paired":
                 test_name = "Wilcoxonの符号付き順位検定"
-            elif simulator.test_info["method"] == "sign":
-                test_name = "符号検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
         st.text(

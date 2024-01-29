@@ -62,6 +62,7 @@ class Visualizer:
         axes.plot(
             points["h0_x"], points["h0_y"], color="black", linestyle="--", label="H0"
         )
+        print(points["h0_y"], points["h1_y"])
         axes.plot(points["h1_x"], points["h1_y"], color="black", label="H1")
         axes.fill_between(
             points["h1_upperx"], points["h1_uppery"], color="blue", alpha=0.4

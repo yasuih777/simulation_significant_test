@@ -4,7 +4,7 @@ from typing import Callable, Literal, Optional, TypedDict
 
 
 class TestInfo(TypedDict):
-    method: Optional[Literal["welch", "student", "paired", "one-sample", "sign"]]
+    method: Literal["normal", "welch", "student", "paired", "one-sample"]
     alternative: Literal["two-sided", "less", "greater"]
     alpha: float
 

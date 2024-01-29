@@ -105,14 +105,14 @@ class StatTestSimulator:
         self.reset_h_parameter()
         self.reset_refection()
 
-        h0_range = self.plot_range()
+        h0_range, h1_range = self.plot_range()
         h0_param = self.h0_param.copy()
         h1_param = self.h1_param.copy()
 
         h0_x = np.linspace(h0_range[0], h0_range[1], delta)
         h0_param.update(x=h0_x)
         h0_y = self.test_funcs["stat_prob"](**h0_param)
-        h1_x = h0_x + np.mean(self.results["stat_values"])
+        h1_x = np.linspace(h1_range[0], h1_range[1], delta)
         h1_param.update(x=h1_x)
         h1_y = self.test_funcs["stat_prob"](**h1_param)
 
@@ -190,10 +190,12 @@ class TTestSimulator(StatTestSimulator):
             self.test_param.update(b=self.generators["Y"].create_sample())
 
     def plot_range(self) -> tuple[float, float]:
-        param = self.h0_param.copy()
-        param.update(confidence=self.plot_prob)
+        param0 = self.h0_param.copy()
+        param0.update(confidence=self.plot_prob)
+        param1 = self.h1_param.copy()
+        param1.update(confidence=self.plot_prob)
 
-        return stats.nct.interval(**param)
+        return (stats.nct.interval(**param0), stats.nct.interval(**param1))
 
 
 class WilcoxonTestSimulator(StatTestSimulator):
@@ -215,15 +217,13 @@ class WilcoxonTestSimulator(StatTestSimulator):
             "stat_quan_inv": stats.norm.isf,
         }
 
-        if self.test_info["method"] is None:
+        if self.test_info["method"] == "normal":
             self.test_funcs["test"] = stats.mannwhitneyu
         elif self.test_info["method"] == "paired":
             self.test_funcs["test"] = stats.wilcoxon
-        elif self.test_info["method"] == "sign":
-            self.test_funcs["test"] = stats.wilcoxon
         else:
             raise ValueError(
-                "t test method must be [None, paired, sign]"
+                "t test method must be [normal, paired]"
             )
 
     def reset_h_parameter(self) -> None:
@@ -231,33 +231,27 @@ class WilcoxonTestSimulator(StatTestSimulator):
 
         nx = self.generators["X"].sample_size
         ny = self.generators["Y"].sample_size
-        if self.test_info["method"] is None:
+        if self.test_info["method"] == "normal":
             mu = nx * ny / 2
             sigma = np.sqrt(nx * ny * (nx + ny + 1) / 12)
         elif self.test_info["method"] == "paired":
             mu = nx * (nx + 1) / 2
             sigma = np.sqrt(nx * (nx + 1) * (2 * nx + 1) / 24)
-        elif self.test_info["method"] == "sign":
-            mu = nx / 2
-            sigma = np.sqrt(nx / 4)
 
         self.h0_param.update(loc=mu, scale=sigma)
         self.h1_param.update(loc=nc, scale=sigma)
-    
+
     def sample_update(self) -> None:
-        if self.test_info["method"] != "sign":
-            self.test_param.update(x=self.generators["X"].create_sample())
-            self.test_param.update(y=self.generators["Y"].create_sample())
-        else:
-            self.test_param.update(
-                x=self.generators["X"].create_sample() - self.generators["Y"].create_sample()
-            )
+        self.test_param.update(x=self.generators["X"].create_sample())
+        self.test_param.update(y=self.generators["Y"].create_sample())
 
     def plot_range(self) -> tuple[float, float]:
-        param = self.h0_param.copy()
-        param.update(confidence=self.plot_prob)
+        param0 = self.h0_param.copy()
+        param0.update(confidence=self.plot_prob)
+        param1 = self.h1_param.copy()
+        param1.update(confidence=self.plot_prob)
 
-        return stats.norm.interval(**param)
+        return (stats.norm.interval(**param0), stats.norm.interval(**param1))
 
 
 def build_simulator(name: str, **args) -> StatTestSimulator:
