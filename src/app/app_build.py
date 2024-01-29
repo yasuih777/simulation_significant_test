@@ -184,7 +184,9 @@ class AppBuilder:
         if test_name == "t_test":
             method = st.selectbox("T検定のメソッド", ["welch", "student", "paired"])
         elif test_name == "wilcoxon_test":
-            method = st.selectbox("Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"])
+            method = st.selectbox(
+                "Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"]
+            )
         else:
             method = None
 

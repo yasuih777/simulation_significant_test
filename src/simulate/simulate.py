@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 from collections import deque
-from typing import Any, Literal, Optional, Callable
+from typing import Any, Callable, Literal, Optional
 
 import numpy as np
 from scipy import stats
@@ -34,10 +34,7 @@ class StatTestSimulator:
         set_seed(seed)
 
     def per_signicant(self) -> float:
-        return (
-            np.count_nonzero(self.p_values < self.test_info["alpha"])
-            / self.iters
-        )
+        return np.count_nonzero(self.p_values < self.test_info["alpha"]) / self.iters
 
     def basic_patch(self, idx: int) -> None:
         self.sample_update()
@@ -51,7 +48,7 @@ class StatTestSimulator:
             pass
 
         deque(map(batch_func, range(self.iters)))
-    
+
     def sample_update(self) -> None:
         raise NotImplementedError("Must override!!")
 
@@ -82,7 +79,7 @@ class TTestSimulator(StatTestSimulator):
             raise ValueError(
                 "t test method must be [welch, student, paired, one-sample]"
             )
-    
+
     def sample_update(self) -> None:
         self.test_param.update(a=self.generators["X"].create_sample())
         if self.test_info["method"] != "one-sample":
@@ -105,9 +102,7 @@ class WilcoxonTestSimulator(StatTestSimulator):
         elif self.test_info["method"] == "paired":
             self.test_funcs = stats.wilcoxon
         else:
-            raise ValueError(
-                "t test method must be [normal, paired]"
-            )
+            raise ValueError("t test method must be [normal, paired]")
 
     def sample_update(self) -> None:
         self.test_param.update(x=self.generators["X"].create_sample())
