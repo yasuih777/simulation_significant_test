@@ -1,30 +1,26 @@
 # !/usr/bin/env python3
 
 import matplotlib.pyplot as plt
-import numpy as np
 
-from src.simulate import simulate
+from src.simulate import simulate, generate
 
 
 class Visualizer:
-    def __init__(self, simulator: simulate.StatTestSimulator) -> None:
-        self.simulator = simulator
+    def __init__(self, generators: dict[str, generate.DistGenerator]) -> None:
+        self.generators = generators
+        self.simulator: simulate.StatTestSimulator
 
-    def reset_simulator(self, simulator: simulate.StatTestSimulator) -> None:
+    def update_simulator(self, simulator: simulate.StatTestSimulator) -> None:
         self.simulator = simulator
 
     def generate_density(self, axes: plt.Axes) -> plt.Axes:
-        points_x = self.simulator.generators["X"].density_points(1000)
-        points_y = self.simulator.generators["Y"].density_points(1000)
-        label_x = self.simulator.generators["X"].dist_name
-        label_y = self.simulator.generators["Y"].dist_name
+        for key, generator in self.generators.items():
+            points = generator.density_points(1000)
+            label = generator.dist_name
 
-        axes.fill_between(
-            points_x["x"], points_x["y"], alpha=0.5, label=f"X: {label_x}"
-        )
-        axes.fill_between(
-            points_y["x"], points_y["y"], alpha=0.5, label=f"Y: {label_y}"
-        )
+            axes.fill_between(
+                points["x"], points["y"], alpha=0.5, label=f"{key}: {label}"
+            )
         axes.set_title("Generator probability distribution")
         axes.set_xlabel("X")
         axes.set_ylabel("Density")

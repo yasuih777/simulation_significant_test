@@ -17,23 +17,11 @@ class AppBuilder:
         self.test_name: list[str] = ["t_test", "wilcoxon_test"]
         self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
         self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
-        self.operation_name: list@str = ["basic"]
+        self.operation_name: list[str] = ["basic"]
 
-        self.generators: dict[str, generate.DistGenerator] = {
-            "X": generate.build_generator(self.dist_name[0], **self.dist_param["X"]),
-            "Y": generate.build_generator(self.dist_name[0], **self.dist_param["Y"]),
-        }
-        self.simulator: simulate.StatTestSimulator = simulate.build_simulator(
-            self.test_name[0],
-            test_info={
-                "method": "welch",
-                "alternative": "two-sided",
-                "alpha": 0.05,
-            },
-            generators=self.generators,
-            iters=10000,
-        )
-        self.visualizer: visualize.Visualizer = visualize.Visualizer(self.simulator)
+        self.generators: dict[str, generate.DistGenerator] = {}
+        self.simulator: simulate.StatTestSimulator
+        self.visualizer: visualize.Visualizer
 
         self.simulation_param: dict[str, Any] = {}
         self.simulation_flag: bool = False
@@ -119,6 +107,7 @@ class AppBuilder:
                     self.__generate_input("X")
 
         fig, ax = visualize.create_figure(figsize=(8, 3))
+        self.visualizer = visualize.Visualizer(self.simulation_param["generators"])
         self.visualizer.generate_density(ax)
         st.pyplot(fig)
         fig.clear()
@@ -158,7 +147,6 @@ class AppBuilder:
             test_name,
             **self.simulation_param
         )
-
         self.__test_discription()
 
         self.simulation_flag = st.button("シミュレーション開始", type="primary")
@@ -275,4 +263,4 @@ class AppBuilder:
         with st.spinner("Simulator progress..."):
             self.simulator.execute()
 
-        self.visualizer.reset_simulator(self.simulator)
+        self.visualizer.update_simulator(self.simulator)
