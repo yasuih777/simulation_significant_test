@@ -220,7 +220,6 @@ class AppBuilder:
 
     def __test_discription(self) -> None:
         simulator = self.simulator
-        generators = self.simulator.generators
 
         if simulator.test_info["alternative"] == "two-sided":
             alternative = "両側"

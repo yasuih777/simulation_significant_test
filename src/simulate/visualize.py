@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 
-from src.simulate import simulate, generate
+from src.simulate import simulate
 
 
 class Visualizer:
