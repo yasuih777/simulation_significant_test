@@ -21,6 +21,10 @@ class Visualizer:
                 points["x"], points["y"], alpha=0.5, label=f"{key}: {label}"
             )
 
+        if self.simulator.test_info["method"] == "one-sample":
+            mu = self.simulator.test_param["popmean"]
+            axes.axvline(x=mu, color="black", linestyle="--", label=f"baseline: {mu}")
+
         axes.set_title("Generator probability distribution")
         axes.set_xlabel("X")
         axes.set_ylabel("Density")

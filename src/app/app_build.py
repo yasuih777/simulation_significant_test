@@ -237,7 +237,7 @@ class AppBuilder:
             elif simulator.test_info["method"] == "paired":
                 test_name = "対応のあるのT検定"
             elif simulator.test_info["method"] == "one-sample":
-                test_name = "1標本T検定"
+                test_name = f"1標本T検定(比較値: {self.simulation_param['mu']})"
         elif isinstance(simulator, simulate.WilcoxonTestSimulator):
             if simulator.test_info["method"] == "normal":
                 test_name = "MannwhitneyのU検定"
