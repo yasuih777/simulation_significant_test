@@ -16,7 +16,7 @@ TEST_TYPE = Literal["basic"]
 class StatTestSimulator:
     def __init__(
         self,
-        test_info: Callable,
+        test_info: TestInfo,
         generators: dict[str, DistGenerator],
         iters: int = 10000,
         test_type: TEST_TYPE = "basic",
