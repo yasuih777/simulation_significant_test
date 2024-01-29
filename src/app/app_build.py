@@ -245,14 +245,10 @@ class AppBuilder:
                 test_name = "Wilcoxonの符号付き順位検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
-        st.text(
-            f'X群: {generators["X"].dist_name}に従う'
-            f'サンプルサイズ{generators["X"].sample_size}の標本'
-        )
-        if simulator.test_info["method"] != "one-sample":
+        for key, generator in self.simulator.generators.items():
             st.text(
-                f'Y群: {generators["Y"].dist_name}に従う'
-                f'サンプルサイズ{generators["Y"].sample_size}の標本'
+                f"{key}群: {generator.dist_name}に従う"
+                f"サンプルサイズ{generator.sample_size}の標本"
             )
 
         st.text(
