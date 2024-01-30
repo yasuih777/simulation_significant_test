@@ -10,7 +10,7 @@ from src.simulate.generate import DistGenerator
 from src.utils.typing import TestInfo
 from src.utils.utils import set_seed
 
-TEST_TYPE = Literal["basic"]
+TEST_TYPE = Literal["basic", "another_test"]
 
 
 """
@@ -43,10 +43,21 @@ class StatTestSimulator:
         self.sample_update()
         test_result = self.test_funcs(**self.test_param)
         self.p_values[idx] = test_result.pvalue
+    
+    def another_test_patch(self, idx: int) -> None:
+        for _ in range(2):
+            self.sample_update()
+            test_result = self.test_funcs(**self.test_param)
+            pvalue = test_result.pvalue
+            if pvalue < self.test_info["alpha"]:
+                break
+        self.p_values[idx] = pvalue
 
     def execute(self) -> None:
         if self.test_type == "basic":
             batch_func = self.basic_patch
+        elif self.test_type == "another_test":
+            batch_func = self.another_test_patch
         else:
             pass
 

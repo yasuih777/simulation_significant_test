@@ -16,7 +16,7 @@ class AppBuilder:
 
         self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
         self.dist_name: list[str] = ["norm", "lognorm", "gamma", "uniform"]
-        self.operation_name: list[str] = ["basic"]
+        self.operation_name: list[simulate.TEST_TYPE] = ["basic", "another_test"]
 
         self.generators: dict[str, generate.DistGenerator] = {}
         self.simulator: simulate.StatTestSimulator
@@ -260,6 +260,9 @@ class AppBuilder:
 
         if simulator.test_type == "basic":
             pass
+        elif simulator.test_type == "another_test":
+            st.warning("p Hackking!!")
+            st.markdown("1度の試行で対立仮説が棄却できなかった場合、もう一度試行を行います。")            
 
     def __simulation(self) -> None:
         with st.spinner("Simulator progress..."):
