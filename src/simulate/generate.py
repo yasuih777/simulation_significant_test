@@ -7,7 +7,9 @@ from scipy import stats
 
 from src.utils.typing import GeneratorFunc
 
-
+"""
+Basic Generator
+"""
 class DistGenerator:
     def __init__(self, sample_size: int = 50) -> None:
         self.sample_size = sample_size
@@ -42,6 +44,9 @@ class DistGenerator:
         return {"x": x_vec, "y": y_vec}
 
 
+"""
+Continue distribution Generator
+"""
 class NormGenerator(DistGenerator):
     def __init__(self, sample_size: int = 50, mu: float = 0, sigma: float = 1) -> None:
         super().__init__(sample_size)

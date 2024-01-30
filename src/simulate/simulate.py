@@ -13,6 +13,9 @@ from src.utils.utils import set_seed
 TEST_TYPE = Literal["basic"]
 
 
+"""
+Basic simulator
+"""
 class StatTestSimulator:
     def __init__(
         self,
@@ -52,7 +55,9 @@ class StatTestSimulator:
     def sample_update(self) -> None:
         raise NotImplementedError("Must override!!")
 
-
+"""
+2 samples simulator
+"""
 class TTestSimulator(StatTestSimulator):
     def __init__(
         self,
