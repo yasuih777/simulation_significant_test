@@ -14,9 +14,8 @@ class AppBuilder:
     def __init__(self) -> None:
         self.logger = logging.set_logger("warning")
 
-        self.test_name: list[str] = ["t_test", "wilcoxon_test"]
+        self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
         self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
-        self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
         self.operation_name: list[str] = ["basic"]
 
         self.generators: dict[str, generate.DistGenerator] = {}
@@ -162,29 +161,31 @@ class AppBuilder:
             st.pyplot(fig)
 
     def __generate_input(self, name: str) -> None:
+        dist_param = {name: {}}
+
         dist_name = st.selectbox(f"{name}群の分布", self.dist_name)
-        self.dist_param[name].update(
+        dist_param[name].update(
             sample_size=st.number_input(f"{name}群のサンプルサイズ", min_value=1, value=50)
         )
 
         if dist_name == "norm":
-            self.dist_param[name].update(mu=st.number_input(f"{name}: mu", value=0.0))
-            self.dist_param[name].update(
+            dist_param[name].update(mu=st.number_input(f"{name}: mu", value=0.0))
+            dist_param[name].update(
                 sigma=st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)
             )
         elif dist_name == "lognorm":
-            self.dist_param[name].update(
+            dist_param[name].update(
                 mu=st.number_input(f"{name}: mu", min_value=-0.0, value=1.0)
             )
-            self.dist_param[name].update(
+            dist_param[name].update(
                 sigma=st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)
             )
         elif dist_name == "uniform":
-            self.dist_param[name].update(a=st.number_input(f"{name}: a", value=0.0))
-            self.dist_param[name].update(b=st.number_input(f"{name}: b", value=1.0))
+            dist_param[name].update(a=st.number_input(f"{name}: a", value=0.0))
+            dist_param[name].update(b=st.number_input(f"{name}: b", value=1.0))
 
         self.generators[name] = generate.build_generator(
-            dist_name, **self.dist_param[name]
+            dist_name, **dist_param[name]
         )
 
         self.simulation_param.update(generators=self.generators)
@@ -202,6 +203,10 @@ class AppBuilder:
         elif test_name == "wilcoxon_test":
             method = st.selectbox(
                 "Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"]
+            )
+        elif test_name == "brunner_munzel_test":
+            method = st.selectbox(
+                "BrunnerMunzel検定のメソッド", ["normal"]
             )
         else:
             method = None
@@ -232,6 +237,8 @@ class AppBuilder:
                 test_name = "MannwhitneyのU検定"
             elif simulator.test_info["method"] == "paired":
                 test_name = "Wilcoxonの符号付き順位検定"
+        elif isinstance(simulator, simulate.BrunnerMunzelTestSimulator):
+            test_name = "BrunnerMunzel検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
         for key, generator in self.simulator.generators.items():
