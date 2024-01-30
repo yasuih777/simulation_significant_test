@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 import platform
-from typing import Optional, Any
+from typing import Any, Optional
 
 import pkg_resources
 import streamlit as st
@@ -14,9 +14,8 @@ class AppBuilder:
     def __init__(self) -> None:
         self.logger = logging.set_logger("warning")
 
-        self.test_name: list[str] = ["t_test", "wilcoxon_test"]
-        self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
-        self.dist_param: dict[str, dict[str, float | int]] = {"X": {}, "Y": {}}
+        self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
+        self.dist_name: list[str] = ["norm", "lognorm", "gamma", "uniform"]
         self.operation_name: list[str] = ["basic"]
 
         self.generators: dict[str, generate.DistGenerator] = {}
@@ -126,9 +125,7 @@ class AppBuilder:
                         seed=st.number_input("乱数シード値", min_value=0)
                     )
                 else:
-                    self.simulation_param.update(
-                        seed=None
-                    )
+                    self.simulation_param.update(seed=None)
 
         self.simulation_param.update(
             test_info={
@@ -137,10 +134,7 @@ class AppBuilder:
                 "alpha": alpha,
             }
         )
-        self.simulator = simulate.build_simulator(
-            test_name,
-            **self.simulation_param
-        )
+        self.simulator = simulate.build_simulator(test_name, **self.simulation_param)
         self.visualizer = visualize.Visualizer(self.simulator)
 
         discription_body = st.columns(2)
@@ -151,7 +145,6 @@ class AppBuilder:
             self.visualizer.generate_density(ax)
             st.pyplot(fig)
             fig.clear()
-
 
         self.simulation_flag = st.button("シミュレーション開始", type="primary")
         if self.simulation_flag:
@@ -168,35 +161,38 @@ class AppBuilder:
             st.pyplot(fig)
 
     def __generate_input(self, name: str) -> None:
+        dist_param = {name: {}}
+
         dist_name = st.selectbox(f"{name}群の分布", self.dist_name)
-        self.dist_param[name].update(
+        dist_param[name].update(
             sample_size=st.number_input(f"{name}群のサンプルサイズ", min_value=1, value=50)
         )
 
         if dist_name == "norm":
-            self.dist_param[name].update(
-                mu=st.number_input(f"{name}: mu", value=0.0)
-            )
-            self.dist_param[name].update(
+            dist_param[name].update(mu=st.number_input(f"{name}: mu", value=0.0))
+            dist_param[name].update(
                 sigma=st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)
             )
         elif dist_name == "lognorm":
-            self.dist_param[name].update(
+            dist_param[name].update(
                 mu=st.number_input(f"{name}: mu", min_value=-0.0, value=1.0)
             )
-            self.dist_param[name].update(
+            dist_param[name].update(
                 sigma=st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)
             )
+        elif dist_name == "gamma":
+            dist_param[name].update(
+                alpha=st.number_input(f"{name}: alpha", min_value=-0.0, value=1.0)
+            )
+            dist_param[name].update(
+                beta=st.number_input(f"{name}: beta", min_value=0.0, value=1.0)
+            )
         elif dist_name == "uniform":
-            self.dist_param[name].update(
-                a=st.number_input(f"{name}: a", value=0.0)
-            )
-            self.dist_param[name].update(
-                b=st.number_input(f"{name}: b", value=1.0)
-            )
+            dist_param[name].update(a=st.number_input(f"{name}: a", value=0.0))
+            dist_param[name].update(b=st.number_input(f"{name}: b", value=1.0))
 
         self.generators[name] = generate.build_generator(
-            dist_name, **self.dist_param[name]
+            dist_name, **dist_param[name]
         )
 
         self.simulation_param.update(generators=self.generators)
@@ -208,10 +204,16 @@ class AppBuilder:
         test_name = st.selectbox("検定", self.test_name)
 
         if test_name == "t_test":
-            method = st.selectbox("T検定のメソッド", ["welch", "student", "paired", "one-sample"])
+            method = st.selectbox(
+                "T検定のメソッド", ["welch", "student", "paired", "one-sample"]
+            )
         elif test_name == "wilcoxon_test":
             method = st.selectbox(
                 "Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"]
+            )
+        elif test_name == "brunner_munzel_test":
+            method = st.selectbox(
+                "BrunnerMunzel検定のメソッド", ["normal"]
             )
         else:
             method = None
@@ -220,7 +222,6 @@ class AppBuilder:
 
     def __test_discription(self) -> None:
         simulator = self.simulator
-        generators = self.simulator.generators
 
         if simulator.test_info["alternative"] == "two-sided":
             alternative = "両側"
@@ -243,12 +244,13 @@ class AppBuilder:
                 test_name = "MannwhitneyのU検定"
             elif simulator.test_info["method"] == "paired":
                 test_name = "Wilcoxonの符号付き順位検定"
+        elif isinstance(simulator, simulate.BrunnerMunzelTestSimulator):
+            test_name = "BrunnerMunzel検定"
 
         st.text(f"以下の設定でシミュレーションを{simulator.iters}回行う")
         for key, generator in self.simulator.generators.items():
             st.text(
-                f"{key}群: {generator.dist_name}に従う"
-                f"サンプルサイズ{generator.sample_size}の標本"
+                f"{key}群: {generator.dist_name}に従う" f"サンプルサイズ{generator.sample_size}の標本"
             )
 
         st.text(

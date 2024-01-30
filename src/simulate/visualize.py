@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 
-from src.simulate import simulate, generate
+from src.simulate import simulate
 
 
 class Visualizer:
@@ -34,7 +34,9 @@ class Visualizer:
 
     def p_histogram(self, axes: plt.Axes) -> plt.Axes:
         bins = 100
-        axes.axhline(y = self.simulator.iters / bins, linestyle="--", color="black", alpha=0.5)
+        axes.axhline(
+            y=self.simulator.iters / bins, linestyle="--", color="black", alpha=0.5
+        )
         axes.hist(
             self.simulator.p_values,
             bins=bins,

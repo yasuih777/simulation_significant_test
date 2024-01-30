@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 
-from typing import Callable, Literal, Optional, TypedDict
+from typing import Callable, Literal, TypedDict
 
 
 class TestInfo(TypedDict):

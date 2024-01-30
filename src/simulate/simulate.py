@@ -13,6 +13,9 @@ from src.utils.utils import set_seed
 TEST_TYPE = Literal["basic"]
 
 
+"""
+Basic simulator
+"""
 class StatTestSimulator:
     def __init__(
         self,
@@ -52,7 +55,9 @@ class StatTestSimulator:
     def sample_update(self) -> None:
         raise NotImplementedError("Must override!!")
 
-
+"""
+2 samples simulator
+"""
 class TTestSimulator(StatTestSimulator):
     def __init__(
         self,
@@ -109,9 +114,29 @@ class WilcoxonTestSimulator(StatTestSimulator):
         self.test_param.update(y=self.generators["Y"].create_sample())
 
 
+class BrunnerMunzelTestSimulator(StatTestSimulator):
+    def __init__(
+        self,
+        test_info: TestInfo,
+        generators: dict[str, DistGenerator],
+        iters: int = 10000,
+        test_type: TEST_TYPE = "basic",
+        seed: int | None = None,
+    ) -> None:
+        super().__init__(test_info, generators, iters, test_type, seed)
+
+        self.test_funcs = stats.brunnermunzel
+
+    def sample_update(self) -> None:
+        self.test_param.update(x=self.generators["X"].create_sample())
+        self.test_param.update(y=self.generators["Y"].create_sample())
+
+
 def build_simulator(name: str, **args) -> StatTestSimulator:
     if name == "t_test":
         return TTestSimulator(**args)
-    if name == "wilcoxon_test":
+    elif name == "wilcoxon_test":
         return WilcoxonTestSimulator(**args)
+    elif name == "brunner_munzel_test":
+        return BrunnerMunzelTestSimulator(**args)
     return StatTestSimulator(**args)
