@@ -23,11 +23,7 @@ class DistGenerator:
 
     def create_sample(self, simulation_iter: Optional[int] = None) -> np.ndarray:
         param = self.func_param.copy()
-
-        if simulation_iter is None:
-            param.update(size=self.sample_size)
-        else:
-            param.update(size=(simulation_iter, self.sample_size))
+        param.update(size=self.sample_size)
 
         return self.funcs["rand"](**param)
 

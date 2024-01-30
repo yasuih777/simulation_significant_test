@@ -16,7 +16,7 @@ class AppBuilder:
 
         self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
         self.dist_name: list[str] = ["norm", "lognorm", "gamma", "uniform"]
-        self.operation_name: list[str] = ["basic"]
+        self.operation_name: list[simulate.TEST_TYPE] = ["basic", "another_test", "add_sample"]
 
         self.generators: dict[str, generate.DistGenerator] = {}
         self.simulator: simulate.StatTestSimulator
@@ -111,7 +111,7 @@ class AppBuilder:
             with sparam_body[0]:
                 self.simulation_param.update(
                     iters=st.number_input(
-                        "シミュレーション回数", min_value=1000, value=10000, step=100
+                        "シミュレーション回数", min_value=100, value=10000, step=100
                     )
                 )
             with sparam_body[1]:
@@ -260,6 +260,12 @@ class AppBuilder:
 
         if simulator.test_type == "basic":
             pass
+        elif simulator.test_type == "another_test":
+            st.warning("p Hackking!!")
+            st.markdown("1度の試行で対立仮説が棄却できなかった場合、もう一度試行を行います。")
+        elif simulator.test_type == "add_sample":
+            st.warning("p Hackking!!")
+            st.markdown("1度の試行で対立仮説が棄却できなかった場合、各群のサンプルサイズを増やしてもう一度試行を行います。")
 
     def __simulation(self) -> None:
         with st.spinner("Simulator progress..."):
