@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 
-from typing import Optional
+from typing import Optional, Literal
 
 import numpy as np
 from scipy import stats
@@ -18,7 +18,8 @@ class DistGenerator:
         self.func_param: dict[str, int | float]
         self.plot_prob: float = 0.999
 
-        self.dist_name: str = ""
+        self.dist_name: str
+        self.dist_type: Literal["discrete", "continue"]
 
     def create_sample(self, simulation_iter: Optional[int] = None) -> np.ndarray:
         param = self.func_param.copy()
@@ -58,6 +59,7 @@ class NormGenerator(DistGenerator):
         self.func_param = {"loc": mu, "scale": sigma}
 
         self.dist_name = f"Norm({mu}, {sigma})"
+        self.dist_type = "continue"
 
     def plot_range(self) -> tuple[float, float]:
         param = self.func_param.copy()
@@ -78,6 +80,7 @@ class LogNormGenerator(DistGenerator):
         self.func_param = {"scale": np.exp(mu), "s": sigma}
 
         self.dist_name = f"LogNorm({mu}, {sigma})"
+        self.dist_type = "continue"
 
     def plot_range(self) -> tuple[float, float]:
         param = self.func_param.copy()
@@ -97,6 +100,7 @@ class UniGenerator(DistGenerator):
         self.func_param = {"loc": a, "scale": b - a}
 
         self.dist_name = f"Uni({a}, {b})"
+        self.dist_type = "continue"
 
     def plot_range(self) -> tuple[float, float]:
         param = self.func_param.copy()
@@ -104,11 +108,33 @@ class UniGenerator(DistGenerator):
         return (param["loc"], param["loc"] + param["scale"])
 
 
+class GammaGenerator(DistGenerator):
+    def __init__(self, sample_size: int = 50, alpha: float = 1, beta: float = 1) -> None:
+        super().__init__(sample_size)
+
+        self.funcs = {
+            "rand": stats.gamma.rvs,
+            "stat_prob": stats.gamma.pdf,
+        }
+        self.func_param = {"a": alpha, "scale": beta}
+
+        self.dist_name = f"Gamma({alpha}, {beta})"
+        self.dist_type = "continue"
+
+    def plot_range(self) -> tuple[float, float]:
+        param = self.func_param.copy()
+        param.update(q=self.plot_prob)
+
+        return (0, stats.gamma.ppf(**param))
+
+
 def build_generator(name: str, **args) -> DistGenerator:
     if name == "norm":
         return NormGenerator(**args)
     elif name == "lognorm":
         return LogNormGenerator(**args)
+    elif name == "gamma":
+        return GammaGenerator(**args)
     elif name == "uniform":
         return UniGenerator(**args)
     return DistGenerator(**args)

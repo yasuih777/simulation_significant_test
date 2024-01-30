@@ -132,8 +132,6 @@ class BrunnerMunzelTestSimulator(StatTestSimulator):
         self.test_param.update(y=self.generators["Y"].create_sample())
 
 
-
-
 def build_simulator(name: str, **args) -> StatTestSimulator:
     if name == "t_test":
         return TTestSimulator(**args)

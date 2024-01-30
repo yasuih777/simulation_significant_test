@@ -15,7 +15,7 @@ class AppBuilder:
         self.logger = logging.set_logger("warning")
 
         self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
-        self.dist_name: list[str] = ["norm", "lognorm", "uniform"]
+        self.dist_name: list[str] = ["norm", "lognorm", "gamma", "uniform"]
         self.operation_name: list[str] = ["basic"]
 
         self.generators: dict[str, generate.DistGenerator] = {}
@@ -179,6 +179,13 @@ class AppBuilder:
             )
             dist_param[name].update(
                 sigma=st.number_input(f"{name}: sigma", min_value=0.0, value=1.0)
+            )
+        elif dist_name == "gamma":
+            dist_param[name].update(
+                alpha=st.number_input(f"{name}: alpha", min_value=-0.0, value=1.0)
+            )
+            dist_param[name].update(
+                beta=st.number_input(f"{name}: beta", min_value=0.0, value=1.0)
             )
         elif dist_name == "uniform":
             dist_param[name].update(a=st.number_input(f"{name}: a", value=0.0))
