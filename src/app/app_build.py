@@ -35,21 +35,9 @@ class AppBuilder:
         self.body_components()
 
     def sidebar_component(self) -> None:
-        st.sidebar.subheader("親ページ")
         st.sidebar.link_button(
-            "BiostatMoon",
-            "https://yasuih777.github.io/biostatmoon/qmds/",
-            type="primary",
+            "Github", "https://github.com/yasuih777/simulation_significant_test"
         )
-
-        st.sidebar.subheader("その他リンク")
-        st_col = st.sidebar.columns(2)
-        with st_col[0]:
-            st.link_button("X(Twitter)", "https://twitter.com/yugetsubiostat")
-        with st_col[1]:
-            st.link_button(
-                "Github", "https://github.com/yasuih777/simulation_significant_test"
-            )
 
         st.sidebar.subheader("使い方")
         st.sidebar.markdown(
