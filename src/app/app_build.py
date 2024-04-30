@@ -48,6 +48,8 @@ class AppBuilder:
             "5. P値の分布を確認し、健全な検定となっていることを確認します"
         )
 
+        st.sidebar.info("P値の分布がおおよそ一様になっている場合は健全な検定です。")
+
         st.sidebar.subheader("Licence")
         st.sidebar.link_button("MIT Licence", "https://opensource.org/license/mit/")
 
