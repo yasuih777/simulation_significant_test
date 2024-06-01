@@ -1,6 +1,7 @@
 PYTHON_VERSION = 3.10.13
 PYSCRIPT_DIR = src
 CLI_SCRIPT = app.py
+PYLINT_SCORE = 0.85
 
 .PHONY: install_pyenv
 install_pyenv: # install python version maneger tool
@@ -52,5 +53,5 @@ format:
 
 .PHONY: lint
 lint:
-	poetry run pylint ${CLI_SCRIPT}
-	poetry run pylint ${PYSCRIPT_DIR}
+	poetry run pylint ${CLI_SCRIPT} --fail-under=${PYLINT_SCORE}
+	poetry run pylint ${PYSCRIPT_DIR} --fail-under=${PYLINT_SCORE}

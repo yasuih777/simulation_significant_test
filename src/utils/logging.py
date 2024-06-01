@@ -5,6 +5,14 @@ from typing import Literal
 
 
 def set_logger(level: Literal["debug", "info", "warning", "error"]) -> logging.Logger:
+    """set logger
+
+    Args:
+        level (Literal["debug", "info", "warning", "error"]): logging level
+
+    Returns:
+        logging.Logger: logger
+    """
     log_level = get_level(level)
 
     logger = logging.getLogger(__name__)
