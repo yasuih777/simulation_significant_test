@@ -60,6 +60,7 @@ class AppBuilder:
         st.sidebar.link_button(
             "Github", "https://github.com/yasuih777/simulation_significant_test"
         )
+        st.sidebar.link_button("note", "https://note.com/like_biostat/n/na063259c4d0e")
 
         st.sidebar.subheader("使い方")
         st.sidebar.markdown(
