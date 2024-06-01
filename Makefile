@@ -38,9 +38,19 @@ export_requirements:
 streamlit:
 	poetry run streamlit run ${CLI_SCRIPT}
 
+.PHONY: check_type
+check_type:
+	poetry run mypy ${CLI_SCRIPT}
+	poetry run mypy ${PYSCRIPT_DIR}
+
 .PHONY: format
 format:
 	poetry run black ${CLI_SCRIPT}
 	poetry run black ${PYSCRIPT_DIR}
 	poetry run isort ${CLI_SCRIPT}
 	poetry run isort ${PYSCRIPT_DIR}
+
+.PHONY: lint
+lint:
+	poetry run pylint ${CLI_SCRIPT}
+	poetry run pylint ${PYSCRIPT_DIR}
