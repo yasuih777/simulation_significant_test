@@ -1,6 +1,7 @@
 PYTHON_VERSION = 3.10.13
 PYSCRIPT_DIR = src
 CLI_SCRIPT = app.py
+PYLINT_SCORE = 0.85
 
 .PHONY: install_pyenv
 install_pyenv: # install python version maneger tool
@@ -38,9 +39,19 @@ export_requirements:
 streamlit:
 	poetry run streamlit run ${CLI_SCRIPT}
 
+.PHONY: check_type
+check_type:
+	poetry run mypy ${CLI_SCRIPT}
+	poetry run mypy ${PYSCRIPT_DIR}
+
 .PHONY: format
 format:
 	poetry run black ${CLI_SCRIPT}
 	poetry run black ${PYSCRIPT_DIR}
 	poetry run isort ${CLI_SCRIPT}
 	poetry run isort ${PYSCRIPT_DIR}
+
+.PHONY: lint
+lint:
+	poetry run pylint ${CLI_SCRIPT} --fail-under=${PYLINT_SCORE}
+	poetry run pylint ${PYSCRIPT_DIR} --fail-under=${PYLINT_SCORE}

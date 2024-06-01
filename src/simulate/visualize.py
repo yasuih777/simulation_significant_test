@@ -6,13 +6,37 @@ from src.simulate import simulate
 
 
 class Visualizer:
+    """graph visualizer
+
+    Attributes:
+        simulator (simulate.StatTestSimulator): significant test simulator
+    """
+
     def __init__(self, simulator: simulate.StatTestSimulator) -> None:
+        """initiation
+
+        Args:
+            simulator (simulate.StatTestSimulator): significant test simulator
+        """
         self.simulator = simulator
 
     def update_simulator(self, simulator: simulate.StatTestSimulator) -> None:
+        """update simulator
+
+        Args:
+            simulator (simulate.StatTestSimulator): significant test simulator
+        """
         self.simulator = simulator
 
     def generate_density(self, axes: plt.Axes) -> plt.Axes:
+        """create density plot
+
+        Args:
+            axes (plt.Axes): figure axis
+
+        Returns:
+            plt.Axes: figure axis on density plot
+        """
         for key, generator in self.simulator.generators.items():
             points = generator.density_points(1000)
             label = generator.dist_name
@@ -33,6 +57,14 @@ class Visualizer:
         return axes
 
     def p_histogram(self, axes: plt.Axes) -> plt.Axes:
+        """create pvalue histogram plot
+
+        Args:
+            axes (plt.Axes): figure axis
+
+        Returns:
+            plt.Axes: figure axis on density plot
+        """
         bins = 100
         axes.axhline(
             y=self.simulator.iters / bins, linestyle="--", color="black", alpha=0.5
@@ -54,6 +86,11 @@ class Visualizer:
 
 
 def create_figure(**args) -> tuple[plt.Figure, plt.Axes]:
+    """create basic figure
+
+    Returns:
+        tuple[plt.Figure, plt.Axes]: figure and axes
+    """
     fig, axes = plt.subplots(**args)
 
     return fig, axes

@@ -1,9 +1,10 @@
 # !/usr/bin/env python3
+# pylint: disable=not-an-iterable
 
 import platform
 from typing import Any, Optional
 
-import pkg_resources
+import pkg_resources  # type: ignore
 import streamlit as st
 
 from src.simulate import generate, simulate, visualize
@@ -11,12 +12,31 @@ from src.utils import logging
 
 
 class AppBuilder:
+    """application bulder
+
+    Attributes:
+        logger (Logger): logger
+        test_name (list[str]): significant test name
+        dist_name (list[str]): distribution name
+        operation_name (list[simulate.TESTTYPE]): significant test operation
+        generators (dict[str, generate.DistGenerator]): distribution generators
+        simulator (simulate.StatTestSimulator):  significant test simulator
+        visualizer (visualize.Visualizer): graph visualizer
+        simulation_param (dict[str, Any]): simulation parameters
+        simulation_flag (bool): start simualtion flag
+    """
+
     def __init__(self) -> None:
+        """initiation"""
         self.logger = logging.set_logger("warning")
 
         self.test_name: list[str] = ["t_test", "wilcoxon_test", "brunner_munzel_test"]
         self.dist_name: list[str] = ["norm", "lognorm", "gamma", "uniform"]
-        self.operation_name: list[simulate.TEST_TYPE] = ["basic", "another_test", "add_sample"]
+        self.operation_name: list[simulate.TESTTYPE] = [
+            "basic",
+            "another_test",
+            "add_sample",
+        ]
 
         self.generators: dict[str, generate.DistGenerator] = {}
         self.simulator: simulate.StatTestSimulator
@@ -26,6 +46,7 @@ class AppBuilder:
         self.simulation_flag: bool = False
 
     def __call__(self) -> None:
+        """create application body"""
         st.set_page_config(
             page_title="統計的仮説検定シミュレーター",
             layout="wide",
@@ -35,6 +56,7 @@ class AppBuilder:
         self.body_components()
 
     def sidebar_component(self) -> None:
+        """create sidebar component"""
         st.sidebar.link_button(
             "Github", "https://github.com/yasuih777/simulation_significant_test"
         )
@@ -55,11 +77,12 @@ class AppBuilder:
 
         with st.sidebar.expander("Python environment"):
             st.text(f"Python version: {platform.python_version()}")
-            st.text(f"Python pkgs:")
+            st.text("Python pkgs:")
             for pkg in pkg_resources.working_set:
                 st.text(pkg)
 
     def body_components(self) -> None:
+        """create body component"""
         st.title("統計的仮説検定シミュレーター")
 
         st.header("1. 統計的仮説検定の設定")
@@ -151,7 +174,12 @@ class AppBuilder:
             st.pyplot(fig)
 
     def __generate_input(self, name: str) -> None:
-        dist_param = {name: {}}
+        """part of setting generator
+
+        Args:
+            name (str): distribution name
+        """
+        dist_param: dict[str, dict[str, int | float]] = {name: {}}
 
         dist_name = st.selectbox(f"{name}群の分布", self.dist_name)
         dist_param[name].update(
@@ -181,15 +209,18 @@ class AppBuilder:
             dist_param[name].update(a=st.number_input(f"{name}: a", value=0.0))
             dist_param[name].update(b=st.number_input(f"{name}: b", value=1.0))
 
-        self.generators[name] = generate.build_generator(
-            dist_name, **dist_param[name]
-        )
+        self.generators[name] = generate.build_generator(dist_name, **dist_param[name])
 
         self.simulation_param.update(generators=self.generators)
 
         del dist_name
 
     def __test_input(self) -> tuple[str, Optional[str]]:
+        """part of setting significant test operation
+
+        Returns:
+            tuple[str, Optional[str]]: significant test name and method
+        """
         method: Optional[str]
         test_name = st.selectbox("検定", self.test_name)
 
@@ -202,15 +233,16 @@ class AppBuilder:
                 "Wilcoxon(or MannwhitneyのU)検定のメソッド", ["normal", "paired"]
             )
         elif test_name == "brunner_munzel_test":
-            method = st.selectbox(
-                "BrunnerMunzel検定のメソッド", ["normal"]
-            )
+            method = st.selectbox("BrunnerMunzel検定のメソッド", ["normal"])
         else:
             method = None
 
         return test_name, method
 
     def __test_discription(self) -> None:
+        """part of simulation discription"""
+        alternative: str
+        test_name: str
         simulator = self.simulator
 
         if simulator.test_info["alternative"] == "two-sided":
@@ -258,6 +290,7 @@ class AppBuilder:
             st.markdown("1度の試行で対立仮説が棄却できなかった場合、各群のサンプルサイズを増やしてもう一度試行を行います。")
 
     def __simulation(self) -> None:
+        """part of simulation"""
         with st.spinner("Simulator progress..."):
             self.simulator.execute()
 
