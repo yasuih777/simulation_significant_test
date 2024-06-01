@@ -40,3 +40,5 @@ open https://simulationsignificanttest-c8twxxh3xmemx9pjkcyeiq.streamlit.app/
 ```shell
 make streamlit
 ```
+# Link
+- [note](https://note.com/like_biostat/n/na063259c4d0e)
