@@ -57,10 +57,16 @@ class AppBuilder:
 
     def sidebar_component(self) -> None:
         """create sidebar component"""
-        st.sidebar.link_button(
-            "Github", "https://github.com/yasuih777/simulation_significant_test"
-        )
-        st.sidebar.link_button("note", "https://note.com/like_biostat/n/na063259c4d0e")
+        st.sidebar.subheader("リンク")
+        st_col = st.sidebar.columns(3)
+        with st_col[0]:
+            st.link_button("note", "https://note.com/like_biostat/n/na063259c4d0e")
+        with st_col[1]:
+            st.link_button(
+                "Github", "https://github.com/yasuih777/simulation_significant_test"
+            )
+        with st_col[2]:
+            st.link_button("X(Twitter)", "https://x.com/like_biostat")
 
         st.sidebar.subheader("使い方")
         st.sidebar.markdown(
